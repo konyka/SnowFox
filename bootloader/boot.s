@@ -11,7 +11,8 @@
  *        EMail: 13855132@qq.com
  *  Description: 
  * -------------------------------------------------------------------------
- *      History:
+ *      History:1.fix error:boot.s:338: error：attempt to move .org backwards
+ *                Assembly code is longer than 510
  *
  *===========================================================================
  */
@@ -86,7 +87,7 @@ Odd:
 #   display messages
 #============================================================================
 StartBootMessage:
-    .ascii     "Start Booting......\0"
+    .ascii     "Start Booting...\0"
 
 NoLoaderMessage:
     .asciz      "ERROR:No LOADER Found"
