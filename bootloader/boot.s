@@ -13,7 +13,9 @@
  * -------------------------------------------------------------------------
  *      History:1.fix error:boot.s:338: error：attempt to move .org backwards
  *                Assembly code is longer than 510
- *
+ *                     2. fix fat12 file system align issue :.int-->.word 
+ *                         fix no display messages: 
+ *                          move message defines before .org 
  *===========================================================================
  */
 
