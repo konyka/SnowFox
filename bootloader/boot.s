@@ -13,9 +13,9 @@
  * -------------------------------------------------------------------------
  *      History:1.fix error:boot.s:338: error：attempt to move .org backwards
  *                Assembly code is longer than 510
- *                     2. fix fat12 file system align issue :.int-->.word 
- *                         fix no display messages: 
- *                          move message defines before .org 
+ *              2. fix fat12 file system align issue :.int-->.word 
+ *                 fix no display messages: 
+ *                 move message defines before .org 
  *===========================================================================
  */
 
@@ -26,6 +26,15 @@
 .text
 .globl _start
 .code16                              #16 bit mode
+#.equ BaseOfStack, 0x7c00
+.equ    BaseOfLoader, 0x1000
+.equ    OffsetOfLoader, 0x00
+
+.equ    RootDirSectors, 14
+.equ    SectorNumOfRootDirStart, 19
+.equ    SectorNumOfFAT1Start, 1
+.equ    SectorBalance, 17
+
 
 
 #============================================================================
@@ -235,8 +244,8 @@ Label_Go_On_Loading_File:
 
 Label_File_Loaded: 
 
-        jmp     Label_File_Loaded #$BaseOfLoader, $OffsetOfLoader
-
+        jmp     $BaseOfLoader, $OffsetOfLoader#Label_File_Loaded 
+        #jmp     $0x1000, $0x00
 #=======        read one sector from floppy
 
 Func_ReadOneSector: 
@@ -309,15 +318,6 @@ Label_Even_2:
         ret
 
 
-
-#.equ BaseOfStack, 0x7c00
-.equ    BaseOfLoader, 0x1000
-.equ    OffsetOfLoader, 0x00
-
-.equ    RootDirSectors, 14
-.equ    SectorNumOfRootDirStart, 19
-.equ    SectorNumOfFAT1Start, 1
-.equ    SectorBalance, 17
 
 
 
