@@ -20,4 +20,131 @@ os开发日志
    导致定位出错，而这段空间正好都是0x00进行初始化的，所以什么也不显示。
 -------------------------------------------------------------
 
+3. boot.s 中将word ==》hword 运行不正常，看来长度并非找到的资料中的长度，在16模式下，
+word 16bit hword 8bit
+
+-------------------------------------------------------------
+4、oader.o：在函数‘IDT_END’中：
+(.text+0x786):  截断重寻址至相符: R_X86_64_8 针对 .text+504
+
+原因：
+
+IDT: 
+        .fill   0x50,    8,      0
+IDT_END: 
+
+IDT_POINTER: 
+    .word      IDT_END - IDT - 1
+    .byte      IDT
+
+    中的.byte错误，一个字节引发的血案，字节无法对齐，导致问题出现：
+
+解决方法：
+    .byte---》.long
+-------------------------------------------------------------  
+5、as loader.s -o loader.o
+ld loader.o  -Ttext 0x10000 --oformat=binary -Map loader.map -o loader.bin
+loader.o：在函数‘code’中：
+(.text+0x98):  截断重寻址至相符: R_X86_64_16 针对 .text+cb
+loader.o：在函数‘code’中：
+(.text+0xa9):  截断重寻址至相符: R_X86_64_16 针对 .text+56
+
+
+
+
+
+复制img到软件镜像命令
+    dd if=boot.bin of=boot.img bs=512 count=1 conv=notrunc
+
+挂在软盘镜像步骤：
+
+su
+mount boot.img /midea/ -t vfat -o loop
+cp loader.bin /media/
+sync
+
+bochs -f mybochs
+c
+
+umount
+
+
+att反汇编bin
+objdump -D -b binary -m i386 a.bin
+objdump -D a.bin
+
+显示十六进制
+hexdump -C filename
+
+nasm 反汇编
+
+nasm汇编工具:
+
+
+
+反汇编MBR:
+
+dd if=/dev/sdb of=/tmp/sdb.mbr count=1
+
+ndisasm -o0x7c00 sdb.mbr 
+
+==================
+显示16进制内容
+hexdump -C test.O
+-------------------------------------------------------------
+制作软盘景象
+
+    dd if=/dev/zero of=boot.img bs=512 count=2880
+    sleep 2
+
+
+---------------
+        pushl   %fs   ################??o32
+        pushl   %edi
+        pushl   %ds    ##############?? o32
+
+        -》
+        pushw   %fs   ################??o32
+        pushl   %edi
+        pushw   %ds    ##############?? o32
+
+
+-------
+        popl    %ds  #o32
+        popl    %edi
+        popl    %fs  #o32
+
+        ->
+        popw    %ds  #o32
+        popl    %edi
+        popw    %fs  #o32
+
+
+---------
+
+Label_Mov_Kernel:        #------------------
+        
+        movb    %ds:(%esi), %al
+        movb    %al,%fs:(%edi)
+--》〉
+Label_Mov_Kernel:        #------------------
+        .byte   0x3E
+        movb    %ds:(%esi), %al
+        movb    %al,%fs:(%edi)
+=============
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

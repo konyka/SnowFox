@@ -1,0 +1,327 @@
+1.寄存器引用 
+   引用寄存器要在寄存器号前加百分号%,如“movl %eax, %ebx”。 
+    80386有如下寄存器： 
+    8个32-bit寄存器 %eax，%ebx，%ecx，%edx，%edi，%esi，%ebp，%esp； 
+    8个16-bit寄存器 它们事实上是上面8个32-bit寄存器的低16位：
+                   %ax，%bx，%cx，%dx，%di，%si，%bp，%sp； 
+    8个8-bit寄存器  %ah，%al，%bh，%bl，%ch，%cl，%dh，%dl。
+                  它们事实上是寄存器%ax，%bx，%cx，%dx的高8位和低8位； 
+    6个段寄存器   %cs(code)，%ds(data)，%ss(stack), %es，%fs，%gs； 
+    3个控制寄存器 %cr0，%cr2，%cr3； 
+    6个debug寄存器  %db0，%db1，%db2，%db3，%db6，%db7； 
+    2个测试寄存器  %tr6，%tr7； 
+    8个浮点寄存器栈 %st(0)，%st(1)，%st(2)，%st(3)，%st(4)，%st(5)，%st(6)，%st(7)。 
+2. 操作数顺序 
+    操作数排列是从源（左）到目的（右），如“movl %eax(源）, %ebx(目的）” 
+3. 立即数 
+    使用立即数，要在数前面加符号$
+      如“movl $0x04, %ebx” 
+         或者： 
+         para = 0x04 
+         movl $para, %ebx 
+    指令执行的结果是将立即数04h装入寄存器ebx。 
+4. 符号常数 
+    符号常数直接引用 如 
+    value: .long 0x12a3f2de 
+    movl value , %ebx 
+    指令执行的结果是将常数0x12a3f2de装入寄存器ebx。 
+    引用符号地址在符号前加符号$, 如“movl $value, % ebx”则是将符号value的地址装入寄存
+    器ebx。 
+5. 操作数的长度 
+        操作数的长度用加在指令后的符号表示b(byte, 8-bit), w(word, 16-bits), l
+    (long, 32-bits)，如“movb %al, %bl”，“movw %ax, %bx”，“movl %eax, %ebx ”。 
+        如果没有指定操作数长度的话，编译器将按照目标操作数的长度来设置。比如指令“mov %
+    ax, %bx”，由于目标操作数bx的长度为word，那么编译器将把此指令等同于“movw %ax, %
+    bx”。同样道理，指令“mov $4, %ebx”等同于指令“movl $4, %ebx”，“push %al”等同
+    于“pushb %al”。对于没有指定操作数长度，但编译器又无法猜测的指令，编译器将会报错，
+    比如指令“push $4”。 
+6. 符号扩展和零扩展指令 
+        绝大多数面向80386的AT&T汇编指令与Intel格式的汇编指令都是相同的，符号扩展指令和
+    零扩展指令则是仅有的不同格式指令。符号扩展指令和零扩展指令需要指定源操作数长度和目的
+    操作数长度，即使在某些指令中这些操作数是隐含的。 
+        在AT&T语法中，符号扩展和零扩展指令的格式为，基本部分"movs"和"movz"（对应Intel语
+    法的movsx和movzx），后面跟上源操作数长度和目的操作数长度。movsbl意味着movs （from）
+    byte （to）long；movbw意味着movs （from）byte （to）word；movswl意味着
+    movs （from）word （to）long。对于movz指令也一样。比如指令“movsbl %al, %edx”意味
+    着将al寄存器的内容进行符号扩展后放置到edx寄存器中。 
+ 
+    其它的Intel格式的符号扩展指令还有： 
+            cbw -- sign-extend byte in %al to word in %ax； 
+            cwde -- sign-extend word in %ax to long in %eax； 
+            cwd -- sign-extend word in %ax to long in %dx:%ax； 
+            cdq -- sign-extend dword in %eax to quad in %edx:%eax； 
+    对应的AT&T语法的指令为cbtw，cwtl，cwtd，cltd。 
+7. 调用和跳转指令 
+        段内调用和跳转指令为"call"，"ret"和"jmp"，段间调用和跳转指令为   
+    为:"lcall"，"lret"和"ljmp"。 
+        段间调用和跳转指令的格式为“lcall/ljmp $SECTION, $OFFSET”，而段间返回指令则为
+    “lret $STACK-ADJUST”。 
+8. 前缀 
+    操作码前缀被用在下列的情况： 
+        字符串重复操作指令(rep,repne)； 
+        指定被操作的段(cs,ds,ss,es,fs,gs)； 
+        进行总线加锁(lock)； 
+        指定地址和操作的大小(data16,addr16)； 
+    在AT&T汇编语法中，操作码前缀通常被单独放在一行，后面不跟任何操作数。例如，对于重复
+    scas指令，其写法为： 
+             repne 
+             scas 
+    上述操作码前缀的意义和用法如下： 
+        指定被操作的段前缀为cs,ds,ss,es,fs,和gs。在AT&T语法中，只需要按照
+    section:memory-operand的格式就指定了相应的段前缀。比如：lcall %:realmode_swtch
+    操作数／地址大小
+        前缀是“data16”和"addr16"，它们被用来在32-bit操作数／地址代码中指定16-bit的操
+    作数／地址。 
+        总线加锁前缀“lock”，它是为了在多处理器环境中，保证在当前指令执行期间禁止一切中
+    断。这个前缀仅仅对ADD, ADC, AND, BTC, BTR, BTS, CMPXCHG,DEC, INC, NEG, NOT, 
+    OR, SBB, SUB, XOR, XADD,XCHG指令有效，如果将Lock前缀用在其它指令之前，将会引起异
+    常。 
+        字符串重复操作前缀"rep","repe","repne"用来让字符串操作重复“%ecx”次。 
+9. 内存引用 
+    Intel语法的间接内存引用的格式为： 
+        section:[base+index*scale+displacement] 
+    而在AT&T语法中对应的形式为： 
+        section:displacement(base,index,scale) 
+    其中，base和index是任意的32-bit base和index寄存器。scale可以取值1，2，4，8。如果不
+    指定scale值，则默认值为1。section可以指定任意的段寄存器作为段前缀，默认的段寄存器在
+    不同的情况下不一样。如果你在指令中指定了默认的段前缀，则编译器在目标代码中不会产生此
+    段前缀代码。 
+如果call和jump操作在操作数前指定前缀“*”，则表示是一个绝对地址调用/跳转，也就是说jmp/call指令指定的是一个绝对地址。如果没有指定"*"，则操作数是一个相对地址。 
+
+任何指令如果其操作数是一个内存操作，则指令必须指定它的操作尺寸(byte,word,long），也就是说必须带有指令后缀(b,w,l)。 
+
+
+========
+GCC采用的是AT&T的汇编格式, 也叫GAS格式(Gnu ASembler GNU汇编器), 而微软采用Intel的汇编格式. 
+语法上主要有以下几个不同. 
+1、寄存器命名原则
+
+在 AT&T 汇编格式中，寄存器名要加上 '%' 作为前缀；而在 Intel 汇编格式中，寄存器名不需要加前缀。
+
+AT&T
+
+Intel
+
+说明
+
+%eax
+
+eax
+
+Intel的不带百分号
+
+
+2、源/目的操作数顺序
+
+AT&T 和 Intel 格式中的源操作数和目标操作数的位置正好相反。在 Intel 汇编格式中，目标操作数在源操作数的左边；而在 AT&T 汇编格式中，目标操作数在源操作数的右边。
+
+AT&T
+
+Intel
+
+说明
+
+movl %eax, %ebx
+
+mov ebx, eax
+
+Intel的目的操作数在前,源操作数在后
+
+
+3、常数/立即数的格式
+
+在 AT&T 汇编格式中，用 '$' 前缀表示一个立即操作数；而在 Intel 汇编格式中，立即数的表示不用带任何前缀。
+
+AT&T
+
+Intel
+
+说明
+
+movl $_value,%ebx
+
+mov eax,_value
+
+Intel的立即数前面不带$符号
+
+movl $0xd00d,%ebx
+
+mov ebx,0xd00d
+
+规则同样适用于16进制的立即数
+
+
+4、操作数长度标识
+
+在 AT&T 汇编格式中，操作数的字长由操作符的最后一个字母决定，后缀'b'、'w'、'l'分别表示操作数为字节（byte，8 比特）、字（word，16 比特）和长字（long，32比特）；而在 Intel 汇编格式中，操作数的字长是用 "byte ptr" 和 "word ptr" 等前缀来表示的。
+
+AT&T
+
+Intel
+
+说明
+
+movw %ax,%bx
+
+mov bx,ax
+
+Intel的汇编中, 操作数的长度并不通过指令符号来标识
+
+在AT&T的格式中, 每个操作都有一个字符后缀, 表明操作数的大小. 例如:mov指令有三种形式:
+
+movb  传送字节
+
+movw  传送字
+
+movl   传送双字
+
+因为在许多机器上, 32位数都称为长字(long word), 这是沿用以16位字为标准的时代的历史习惯造成的.
+
+---------摘自《深入理解计算机系统》
+
+
+5、寻址方式
+
+AT&T
+
+Intel
+
+imm32(basepointer,indexpointer,indexscale)
+
+[basepointer + indexpointer*indexscale + imm32)
+
+两种寻址的实际结果都应该是
+
+imm32 +basepointer + indexpointer*indexscale
+
+举例：
+
+AT&T 格式
+
+Intel 格式
+
+movl -4(%ebp), %eax
+
+mov eax, [ebp - 4]
+
+movl array(, %eax, 4), %eax
+
+mov eax, [eax*4 + array]
+
+movw array(%ebx, %eax, 4), %cx
+
+mov cx, [ebx + 4*eax + array]
+
+movb $4, %fs:(%eax)
+
+mov fs:eax, 4
+
+6、跳转指令
+
+在 AT&T 汇编格式中，绝对转移和调用指令（jump/call）的操作数前要加上'*'作为前缀，而在 Intel 格式中则不需要。
+
+远程转移指令和远程子调用指令的操作码，在 AT&T 汇编格式中为 "ljump" 和 "lcall"，而在 Intel 汇编格式中则为 "jmp far" 和 "call far"，即：
+
+AT&T 格式：ljump $section, $offset
+
+Intel 格式： jmp far section:offset
+
+AT&T 格式：lcall $section, $offset
+Intel 格式：call far section:offset
+ 
+
+与之相应的远程返回指令则为：
+
+AT&T 格式：lret $stack_adjust
+ Intel 格式： ret far stack_adjust
+ 
+
+AT&T的汇编格式中, 跳转指令有点特殊.
+
+直接跳转, 即跳转目标是作为指令的一部分编码的.
+
+       例如: jmp Label_1
+
+间接跳转, 即跳转目标是从寄存器或存储器位置中读出的. 写法是在" * "后面跟一个操作数指示符.
+
+       例如: jmp *%eax 用寄存器%eax中的值作为跳转目标
+
+                jmp *(%eax) 以%eax中的值作为读入的地址, 从存储器中读出跳转目标
+
+--------摘自《深入理解计算机系统》
+
+ 
+
+下面是一些寻址的例子：
+
+AT&T: `-4(%ebp)'        相当于 Intel: `[ebp - 4]'
+
+AT&T: `foo(,%eax,4)' 相当于 Intel: `[foo + eax*4]'
+
+AT&T: `foo(,1)'          相当于 Intel `[foo]'
+
+AT&T: `%gs:foo'          相当于 Intel`gs:foo' 
+例子摘自http://sourceware.org/binutils/docs/as/i386_002dMemory.html#i386_002dMemory
+
+ ==============
+
+实现段间跳转的方法
+
+1、
+jmp segment:offset
+如果编译器不支持，可以直接用机器码：
+DB 0EAH
+DW offset
+DW segment
+2、
+push segment
+push offset
+retf
+3、
+jmp DWORD PTR 各种内存寻址方式访问远指针变量
+
+--------
+1、使用LJMP，AT&T和INTEL都支持,比如AT&T的
+    ljmpl  $段基址或者选择符, $段内偏移
+
+2、使用LCALL，进行远程调用
+    lcall  段基址（这个要存在4个段寄存器里面）：(段内偏移）
+   
+3、使用PUSHL，把地址存在CALL调用后返回后自动装载EIP里，
+就是2楼的第二种方法，比如LINUX的HEAD.s有这样的例子：
+    after_page_tables:
+    pushl   $0
+    pushl   $0
+    pushl   $0
+    pushl   $L6
+    pushl   $main
+    jmp     setup_paging
+
+4、似乎linux里面的系统调用算的上是一种段间调用吧
+
+5、2楼的第一种方法
+
+===================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
