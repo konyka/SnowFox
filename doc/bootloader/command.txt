@@ -1,0 +1,67 @@
+/**
+ *===========================================================================
+ *  SnowFox OS Source File.
+ *  Copyright (C), DarkBlue Studios.
+ * -------------------------------------------------------------------------
+ *    File name: boot.s
+ *      Version: v0.0.0
+ *   Created on: Sept 5, 2018 by konyka
+ *       Editor: Sublime Text3 
+ *        EMail: 13855132@qq.com
+ *  Description: 
+ * -------------------------------------------------------------------------
+ *      History:1.fix error:boot.s:338: error：attempt to move .org backwards
+ *                Assembly code is longer than 510
+ *              2. fix fat12 file system align issue :.int-->.word 
+ *                 fix no display messages: 
+ *                 move message defines before .org 
+ *===========================================================================
+ */
+
+
+ 复制img到软件镜像命令
+    dd if=boot.bin of=boot.img bs=512 count=1 conv=notrunc
+
+挂在软盘镜像步骤：
+
+su
+mount boot.img /midea/ -t vfat -o loop
+cp loader.bin /media/
+sync
+
+bochs -f mybochs
+c
+
+umount
+
+
+att反汇编bin
+objdump -D -b binary -m i386 a.bin
+objdump -D a.bin
+
+显示十六进制
+hexdump -C filename
+
+nasm 反汇编
+
+nasm汇编工具:
+
+
+
+反汇编MBR:
+
+dd if=/dev/sdb of=/tmp/sdb.mbr count=1
+
+ndisasm -o0x7c00 sdb.mbr 
+
+==================
+显示16进制内容
+hexdump -C test.O
+-------------------------------------------------------------
+制作软盘景象
+
+    dd if=/dev/zero of=boot.img bs=512 count=2880
+    sleep 2
+
+
+
