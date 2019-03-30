@@ -28,6 +28,9 @@ _start:
     
 .include "fat12.inc"
 
+# placeholder
+.word 0x0000
+
 .equ    BaseOfKernelFile, 0x00
 .equ    OffsetOfKernelFile, 0x100000
 
@@ -47,7 +50,9 @@ LABEL_GDT_END:
 
 GdtPtr:
     .word      GdtLen - 1
-    .long     LABEL_GDT
+    .long     0x00010040#LABEL_GDT
+    #relocation placeholder
+    .word 0x0000  
 
 .equ    SelectorCode32,  LABEL_DESC_CODE32 - LABEL_GDT
 .equ    SelectorData32,  LABEL_DESC_DATA32 - LABEL_GDT
@@ -63,7 +68,7 @@ LABEL_GDT64_END:
 
 GdtPtr64:
     .word      GdtLen64 - 1
-    .long      LABEL_GDT64
+    .long      0x00010060#LABEL_GDT64
 
 .equ    SelectorCode64,  LABEL_DESC_CODE64 - LABEL_GDT64
 .equ    SelectorData64,  LABEL_DESC_DATA64 - LABEL_GDT64
@@ -78,7 +83,7 @@ code:
         movw    %ax, %es
         movw    $0x0000, %ax
         movw    %ax, %ss
-#        movw    $0x7c00, %sp
+        movw    $0x7c00, %sp
 
 #        display on screen : Start Loader......
 #============================================================================
@@ -103,8 +108,8 @@ code:
 
         cli
 
-        .byte 0x66
-        lgdt    GdtPtr
+        #.byte 0x66
+        lgdtl    GdtPtr
 
         movl    %cr0, %eax
         orl     $1,%eax
