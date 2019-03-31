@@ -1,0 +1,75 @@
+os开发日志
+
+19.03.24
+1、.equ 不能放在汇编代码后边，否则会出现
+    can't handle non absolute segment in `jmp'
+    too many memory references for `jmp'
+    之类的错误，，原因可能是无法知晓后面的定义。
+    否则只能使用
+    jmp     $0x1000, $0x00跳转，
+    无法使用
+    jmp     $BaseOfLoader, $OffsetOfLoader#Label_File_Loaded
+    才能编译通过正常运行。更改了equ的位置后 ，后种方法正常编译运行。
+
+2、 在loader的makefile中开始使用了
+   ld loader.o  -Ttext 0x1000 --oformat=binary -Map loader.map -o loader.bin
+   导致没有字符信息显示，黑屏幕，通过调试查看内存，发现均为0x00，
+   后更改为
+   ld loader.o  -Ttext 0x0000 --oformat=binary -Map loader.map -o loader.bin
+   可正常显示，原因是使用-Ttext mov $label 变成了 jmp 0x1000+$label，0x1000成为了固定的偏移量，
+   导致定位出错，而这段空间正好都是0x00进行初始化的，所以什么也不显示。
+-------------------------------------------------------------
+
+3. boot.s 中将word ==》hword 运行不正常，看来长度并非找到的资料中的长度，在16模式下，
+word 16bit hword 8bit
+
+-------------------------------------------------------------
+4、oader.o：在函数‘IDT_END’中：
+(.text+0x786):  截断重寻址至相符: R_X86_64_8 针对 .text+504
+
+原因：
+
+IDT: 
+        .fill   0x50,    8,      0
+IDT_END: 
+
+IDT_POINTER: 
+    .word      IDT_END - IDT - 1
+    .byte      IDT
+
+    中的.byte错误，一个字节引发的血案，字节无法对齐，导致问题出现：
+
+解决方法：
+    .byte---》.long
+-------------------------------------------------------------  
+5、as loader.s -o loader.o
+ld loader.o  -Ttext 0x10000 --oformat=binary -Map loader.map -o loader.bin
+loader.o：在函数‘code’中：
+(.text+0x98):  截断重寻址至相符: R_X86_64_16 针对 .text+cb
+loader.o：在函数‘code’中：
+(.text+0xa9):  截断重寻址至相符: R_X86_64_16 针对 .text+56
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
