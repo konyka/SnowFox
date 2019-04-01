@@ -282,6 +282,15 @@ Label_Mov_Kernel:
 
         jmp     Label_Go_On_Loading_File
 
+
+Label_File_Loaded: 
+
+        movw    $0xB800,%ax
+        movw    %ax,%gs
+        movb    $0xF,%ah                        # 0000: 黑底    1111: 白字
+        movb    $'G', %al
+        movw     %ax,%gs:$((80 * 0 + 39) * 2)
+        
 ######
 #=======        tmp IDT
 
