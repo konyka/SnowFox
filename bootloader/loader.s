@@ -119,7 +119,7 @@ code:
         movw    $SelectorData32, %ax
         movw    %ax,%fs
         movl    %cr0, %eax
-        an.byte    $0b11111110,%al
+        andb    $0b11111110,%al
         movl    %eax, %cr0
 
         sti
@@ -163,7 +163,7 @@ Label_Cmp_FileName:
         jz      Label_FileName_Found
         decw    %cx
         lodsb
-        cmpb    es:di,%al
+        cmpb    %es:(%di),%al
         jz      Label_Go_On
         jmp     Label_Different
 
@@ -207,7 +207,7 @@ Label_FileName_Found:
         movw    $RootDirSectors, %ax
         andw    $0xFFE0,%di
         addw    $0x1A,%di
-        movw    es:di,%cx
+        movw    %es:(%di),%cx
         pushw   %cx
         addw    %ax,%cx
         addw    $SectorBalance, %cx
@@ -250,8 +250,8 @@ Label_Go_On_Loading_File:
 
 Label_Mov_Kernel:
 
-        movb    %ds:%esi,%al
-        movb     %al,%fs:%edi
+        movb    %ds:(%esi),%al
+        movb     %al,%fs:(%edi)
 
         incl    %esi
         incl    %edi
@@ -289,8 +289,8 @@ Label_File_Loaded:
         movw    %ax,%gs
         movb    $0xF,%ah                        # 0000: 黑底    1111: 白字
         movb    $'G', %al
-        movw     %ax,%gs:$((80 * 0 + 39) * 2)
-        
+        movw     %ax,%gs:(((80 * 0 + 39) * 2))
+
 ######
 #=======        tmp IDT
 
