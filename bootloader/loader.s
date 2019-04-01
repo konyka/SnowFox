@@ -201,6 +201,87 @@ Label_No_LoaderBin:
 Label_Current_Line201:
         jmp     Label_Current_Line201
 
+#=======        found kernel.bin  in root director struct
+
+Label_FileName_Found: 
+        movw    $RootDirSectors, %ax
+        andw    $0xFFE0,%di
+        addw    $0x1A,%di
+        movw    es:di,%cx
+        pushw   %cx
+        addw    %ax,%cx
+        addw    $SectorBalance, %cx
+        movl    $BaseTmpOfKernelAddr, %eax      #BaseOfKernelFile
+        movl    %eax,%es
+        movw    $OffsetTmpOfKernelFile, %bx     #OffsetOfKernelFile
+        movw    %cx,%ax
+
+Label_Go_On_Loading_File: 
+        pushw   %ax
+        pushw   %bx
+        movb    $0xE,%ah
+        movb    $'.', %al
+        movb    $0xF,%bl
+        int     $0x10
+        popw    %bx
+        popw    %ax
+
+        movb    $1,%cl
+        call    Func_ReadOneSector
+        popw    %ax
+
+####################### 
+
+        pushw   %cx
+        pushl   %eax
+        pushl   %fs
+        pushl   %edi
+        pushl   %ds
+        pushl   %esi
+
+        movw    $0x200,%cx
+        movw    $BaseOfKernelFile, %ax
+        movw    %ax,%fs
+        movl    OffsetOfKernelFileCount,%edi
+
+        movw    $BaseTmpOfKernelAddr, %ax
+        movw    %ax,%ds
+        movl    $OffsetTmpOfKernelFile, %esi
+
+Label_Mov_Kernel:
+
+        movb    %ds:%esi,%al
+        movb     %al,%fs:%edi
+
+        incl    %esi
+        incl    %edi
+
+        loop    Label_Mov_Kernel
+
+        movl    $0x1000,%eax
+        movl    %eax,%ds
+
+        movl     %edi,   OffsetOfKernelFileCount  
+
+        popl    %esi
+        popl    %ds
+        popl    %edi
+        popl    %fs
+        popl    %eax
+        popw    %cx
+
+####################### 
+
+        call    Func_GetFATEntry
+        cmpw    $0xFFF,%ax
+        jz      Label_File_Loaded
+        pushw   %ax
+        movw    $RootDirSectors, %dx
+        addw    %dx,%ax
+        addw    $SectorBalance, %ax
+
+        jmp     Label_Go_On_Loading_File
+
 ######
 #=======        tmp IDT
 
