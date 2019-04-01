@@ -1,4 +1,3 @@
-
 /**
  *===========================================================================
  *  SnowFox OS Source File.
@@ -134,7 +133,7 @@ code:
 
 #   find out loader.bin
 #============================================================================
-    movw    $SectorNumOfRootDirStart,  SectorNo   
+        movw    $SectorNumOfRootDirStart,  SectorNo   
 
 Lable_Search_In_Root_Dir_Begin: 
 

@@ -119,7 +119,7 @@ code:
         movw    $SelectorData32, %ax
         movw    %ax,%fs
         movl    %cr0, %eax
-        andb    $0b11111110,%al
+        an.byte    $0b11111110,%al
         movl    %eax, %cr0
 
         sti
@@ -184,12 +184,54 @@ Label_Goto_Next_Sector_In_Root_Dir:
         addw    $1,SectorNo
         jmp     Lable_Search_In_Root_Dir_Begin
 
-##
+######
+
+#=======        tmp variable
+
+RootDirSizeForLoop:
+        .word      RootDirSectors
+SectorNo:
+        .word      0
+Odd:
+        .byte      0
+OffsetOfKernelFileCount:
+        .long      OffsetOfKernelFile
+
+DisplayPosition: 
+.long      0
+
+
 #        display messages
 #============================================================================
 
 StartLoaderMessage:
-    .ascii     "Start Loader......"
+        .ascii      "Start Loader......"
+NoLoaderMessage:
+        .byte       "ERROR:No KERNEL Found"
+KernelFileName:
+        .byte      "KERNEL  BIN"
+StartGetMemStructMessage:
+        .byte      "Start Get Memory Struct."
+GetMemStructErrMessage:
+        .byte      "Get Memory Struct ERROR"
+GetMemStructOKMessage:
+        .byte      "Get Memory Struct SUCCESSFUL!"
+
+StartGetSVGAVBEInfoMessage:
+        .byte      "Start Get SVGA VBE Info"
+GetSVGAVBEInfoErrMessage:
+        .byte      "Get SVGA VBE Info ERROR"
+GetSVGAVBEInfoOKMessage:
+        .byte      "Get SVGA VBE Info SUCCESSFUL!"
+
+StartGetSVGAModeInfoMessage:
+        .byte      "Start Get SVGA Mode Info"
+GetSVGAModeInfoErrMessage:
+        .byte      "Get SVGA Mode Info ERROR"
+GetSVGAModeInfoOKMessage:
+        .byte      "Get SVGA Mode Info SUCCESSFUL!"
+
+
 
 
 
