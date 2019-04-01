@@ -184,6 +184,22 @@ Label_Goto_Next_Sector_In_Root_Dir:
         addw    $1,SectorNo
         jmp     Lable_Search_In_Root_Dir_Begin
 
+#=======        display message on screen : ERROR:No KERNEL Found
+
+Label_No_LoaderBin: 
+
+        movw    $0x1301,%ax
+        movw    $0x08C,%bx
+        movw    $0x300,%dx              #row 3
+        movw    $21,%cx
+        pushw   %ax
+        movw    %ds,%ax
+        movw    %ax,%es
+        popw    %ax
+        movw    $NoLoaderMessage, %bp
+        int     $0x10
+        jmp     $
+
 ######
 #=======        tmp IDT
 
