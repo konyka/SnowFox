@@ -1,4 +1,3 @@
-
 /**
  *===========================================================================
  *  SnowFox OS Source File.
@@ -73,6 +72,8 @@ GdtPtr64:
 .equ    SelectorCode64,  LABEL_DESC_CODE64 - LABEL_GDT64
 .equ    SelectorData64,  LABEL_DESC_DATA64 - LABEL_GDT64
 
+.section .s16
+.code16
 
 code:
 
@@ -129,9 +130,61 @@ code:
         xorb    %dl,%dl
         int     $0x13
 
-        Label_Loop_Current_Line:
-        jmp     Label_Loop_Current_Line
+#=======        search kernel.bin
 
+movw    $SectorNumOfRootDirStart, SectorNo     
+
+Lable_Search_In_Root_Dir_Begin: 
+
+        cmpw    $0,RootDirSizeForLoop
+        jz      Label_No_LoaderBin
+        decw    RootDirSizeForLoop
+        movw    $0x0,%ax
+        movw    %ax,%es
+        movw    $0x8000,%bx
+        movw    SectorNo,%ax
+        movb    $1,%cl
+        call    Func_ReadOneSector
+        movw    $KernelFileName, %si
+        movw    $0x8000,%di
+        cld
+        movw    $0x10,%dx
+
+Label_Search_For_LoaderBin: 
+
+        cmpw    $0,%dx
+        jz      Label_Goto_Next_Sector_In_Root_Dir
+        decw    %dx
+        movw    $11,%cx
+
+Label_Cmp_FileName: 
+
+        cmpw    $0,%cx
+        jz      Label_FileName_Found
+        decw    %cx
+        lodsb
+        cmpb    es:di,%al
+        jz      Label_Go_On
+        jmp     Label_Different
+
+Label_Go_On: 
+
+        incw    %di
+        jmp     Label_Cmp_FileName
+
+Label_Different: 
+
+        andw    $0xFFE0,%di
+        addw    $0x20,%di
+        movw    $KernelFileName, %si
+        jmp     Label_Search_For_LoaderBin
+
+Label_Goto_Next_Sector_In_Root_Dir: 
+
+        addw    $1,SectorNo
+        jmp     Lable_Search_In_Root_Dir_Begin
+
+##
 #        display messages
 #============================================================================
 
