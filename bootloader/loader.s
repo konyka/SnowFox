@@ -291,6 +291,14 @@ Label_File_Loaded:
         movb    $'G', %al
         movw     %ax,%gs:(((80 * 0 + 39) * 2))
 
+KillMotor: 
+
+        pushw   %dx
+        movw    $0x3F2,%dx
+        movb    $0,%al
+        outb    %al,%dx
+        popw    %dx
+
 ######
 #=======        tmp IDT
 
