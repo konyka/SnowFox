@@ -185,6 +185,15 @@ Label_Goto_Next_Sector_In_Root_Dir:
         jmp     Lable_Search_In_Root_Dir_Begin
 
 ######
+#=======        tmp IDT
+
+IDT: 
+    .fill   0x50, 8, 0
+IDT_END: 
+
+IDT_POINTER: 
+    .word      IDT_END - IDT - 1
+    .long      IDT
 
 #=======        tmp variable
 
@@ -198,7 +207,7 @@ OffsetOfKernelFileCount:
         .long      OffsetOfKernelFile
 
 DisplayPosition: 
-.long      0
+        .long      0
 
 
 #        display messages
