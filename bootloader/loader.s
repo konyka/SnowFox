@@ -189,8 +189,8 @@ Label_Goto_Next_Sector_In_Root_Dir:
 Label_No_LoaderBin: 
 
         movw    $0x1301,%ax
-        movw    $0x08C,%bx
-        movw    $0x300,%dx              #row 3
+        movw    $0x008C,%bx
+        movw    $0x0300,%dx              #row 3
         movw    $21,%cx
         pushw   %ax
         movw    %ds,%ax
@@ -198,7 +198,8 @@ Label_No_LoaderBin:
         popw    %ax
         movw    $NoLoaderMessage, %bp
         int     $0x10
-        jmp     $
+Label_Current_Line201:
+        jmp     Label_Current_Line201
 
 ######
 #=======        tmp IDT
