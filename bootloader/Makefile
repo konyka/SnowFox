@@ -7,7 +7,7 @@ all:
 	ld boot.o -Ttext 0x7c00 --oformat=binary -Map boot.map -o boot.bin
 	dd if=boot.bin of=boot.img bs=512 count=1 conv=notrunc
 	as loader.s -o loader.o
-	ld loader.o  -Ttext 0x0000 --oformat=binary -Map loader.map -o loader.bin
+	ld loader.o  -Ttext 0x1000 --oformat=binary -Map loader.map -o loader.bin
 
 clean:
 	rm -rf *.o *.map *.bin *.img
