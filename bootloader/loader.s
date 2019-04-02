@@ -573,6 +573,11 @@ GO_TO_TMP_Protect:
         btsl    $5,%eax
         movl    %eax, $cr4
 
+#=======        load    cr3
+
+        movl    $0x90000,%eax
+        movl    %eax, $cr3
+
 ######
 #=======        tmp IDT
 
