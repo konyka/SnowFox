@@ -490,6 +490,15 @@ Label_SVGA_Mode_Info_Finish:
         movw    $GetSVGAModeInfoOKMessage, %bp
         int     $0x10
 
+#=======        set the SVGA mode(VESA VBE)
+
+        movw    $0x4F02,%ax
+        movw    $0x4180,%bx     #========================mode : 0x180 or 0x143
+        int     $0x10
+
+        cmpw    $0x04F,%ax
+        jnz     Label_SET_SVGA_Mode_VESA_VBE_FAIL
+
 ######
 #=======        tmp IDT
 
