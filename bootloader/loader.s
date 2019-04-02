@@ -595,6 +595,29 @@ GO_TO_TMP_Protect:
 
         jmp     $SelectorCode64,OffsetOfKernelFile
 
+#=======        test support long mode or not
+
+support_long_mode: 
+
+        movl    $0x80000000,%eax
+        cpuid
+        cmpl    $0x80000001,%eax
+        setnbb  %al
+        jb      support_long_mode_done
+        movl    $0x80000001,%eax
+        cpuid
+        btl     $29,%edx
+        setcb   %al
+support_long_mode_done: 
+
+        movzbl  %al,%eax
+        ret
+
+#=======        no support
+
+no_support: 
+        jmp     no_support
+
 ######
 #=======        tmp IDT
 
