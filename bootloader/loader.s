@@ -428,6 +428,68 @@ Label_SVGA_Mode_Info_Get:
 
         movw    es:esi,%cx
 
+
+#=======        display SVGA mode information
+
+        pushw   %ax
+
+        movw    $0x0,%ax
+        movb    %ch,%al
+        call    Label_DispAL
+
+        movw    $0x0,%ax
+        movb    %cl,%al
+        call    Label_DispAL
+
+        popw    %ax
+
+#=======
+
+        cmpw    $0xFFFF,%cx
+        jz      Label_SVGA_Mode_Info_Finish
+
+        movw    $0x4F01,%ax
+        int     $0x10
+
+        cmpw    $0x004F,%ax
+
+        jnz     Label_SVGA_Mode_Info_FAIL
+
+        addl    $2,%esi
+        addl    $0x0100,%edi
+
+        jmp     Label_SVGA_Mode_Info_Get
+
+Label_SVGA_Mode_Info_FAIL: 
+
+        movw    $0x1301,%ax
+        movw    $0x008C,%bx
+        movw    $0x0D00,%dx              #row 13
+        movw    $24,%cx
+        pushw   %ax
+        movw    %ds,%ax
+        movw    %ax,%es
+        popw    %ax
+        movw    $GetSVGAModeInfoErrMessage, %bp
+        int     $0x10
+
+Label_SET_SVGA_Mode_VESA_VBE_FAIL: 
+
+        jmp     Label_SET_SVGA_Mode_VESA_VBE_FAIL
+
+Label_SVGA_Mode_Info_Finish: 
+
+        movw    $0x1301,%ax
+        movw    $0x000F,%bx
+        movw    $0x0E00,%dx              #row 14
+        movw    $30,%cx
+        pushw   %ax
+        movw    %ds,%ax
+        movw    %ax,%es
+        popw    %ax
+        movw    $GetSVGAModeInfoOKMessage, %bp
+        int     $0x10
+
 ######
 #=======        tmp IDT
 
