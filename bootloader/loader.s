@@ -554,6 +554,19 @@ GO_TO_TMP_Protect:
 
         movl    $0xa00083,0x92028
 
+#=======        load GDTR64
+
+
+        lgdtl    GdtPtr64
+        movw    $0x10,%ax
+        movw    %ax,%ds
+        movw    %ax,%es
+        movw    %ax,%fs
+        movw    %ax,%gs
+        movw    %ax,%ss
+
+        movl    $0x7E00,%esp
+
 ######
 #=======        tmp IDT
 
