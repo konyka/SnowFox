@@ -386,8 +386,8 @@ Label_Get_Mem_OK:
         popw    %ax
         movw    $GetSVGAVBEInfoErrMessage, %bp
         int     $0x10
-
-        jmp     $
+Label_Current_Line389:
+        jmp     Label_Current_Line389
 
 Label_Get_Mem_OK.KO: 
 
@@ -426,7 +426,7 @@ Label_Get_Mem_OK.KO:
 
 Label_SVGA_Mode_Info_Get: 
 
-        movw    es:esi,%cx
+        movw    %es:(%esi),%cx
 
 
 #=======        display SVGA mode information
@@ -509,14 +509,14 @@ Label_SVGA_Mode_Info_Finish:
 
 #       lidtl    IDT_POINTER
 
-        movl    $cr0, %eax
+        movl    %cr0, %eax
         orl     $1,%eax
-        movl    %eax, $cr0
+        movl    %eax, %cr0
 
-        jmpl    SelectorCode32,GO_TO_TMP_Protect
+        jmpl    $SelectorCode32,$GO_TO_TMP_Protect
 
-#.section .s32
-#.code32
+.section .s32
+.code32
 
 GO_TO_TMP_Protect: 
 
@@ -569,14 +569,14 @@ GO_TO_TMP_Protect:
 
 #=======        open PAE
 
-        movl    $cr4, %eax
+        movl    %cr4, %eax
         btsl    $5,%eax
-        movl    %eax, $cr4
+        movl    %eax, %cr4
 
 #=======        load    cr3
 
         movl    $0x90000,%eax
-        movl    %eax, $cr3
+        movl    %eax, %cr3
 
 #=======        enable long-mode
 
@@ -588,12 +588,12 @@ GO_TO_TMP_Protect:
 
 #=======        open PE and paging
 
-        movl    $cr0, %eax
+        movl    %cr0, %eax
         btsl    $0,%eax
         btsl    $31,%eax
-        movl    %eax, $cr0
+        movl    %eax, %cr0
 
-        jmp     $SelectorCode64,OffsetOfKernelFile
+        jmp     $SelectorCode64,$OffsetOfKernelFile
 
 #=======        test support long mode or not
 
@@ -620,8 +620,8 @@ no_support:
 
 #=======        read one sector from floppy
 
-#.section .s16lib
-#.code16
+.section .s16lib
+.code16
 
 Func_ReadOneSector: 
 
@@ -632,7 +632,7 @@ Func_ReadOneSector:
         pushw   %bx
         movb    BPB_SecPerTrk,%bl
         divb    %bl
-        incl    $0xa
+        incb    %ah
         movb    %ah,%cl
         movb    %al,%dh
         shrb    %al
@@ -681,7 +681,7 @@ Label_Even:
 
         popw    %dx
         addw    %dx,%bx
-        movw    es:bx,%ax
+        movw    %es:(%bx),%ax
         cmpb    $1,Odd
         jnz     Label_Even_2
         shrw    $4,%ax
@@ -718,7 +718,7 @@ Label_DispAL.1:
         addb    $'A', %al
 Label_DispAL.2: 
 
-        movw    %ax,gs:edi
+        movw    %ax,%gs:(%edi)
         addl    $2,%edi
 
         movb    %dl,%al
