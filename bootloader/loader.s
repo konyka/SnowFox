@@ -353,8 +353,8 @@ Label_Get_Mem_OK:
 #=======        get SVGA information
 
         movw    $0x1301,%ax
-        movw    $0x00F,%bx
-        movw    $0x800,%dx              #row 8
+        movw    $0x000F,%bx
+        movw    $0x0800,%dx              #row 8
         movw    $23,%cx
         pushw   %ax
         movw    %ds,%ax
@@ -370,7 +370,7 @@ Label_Get_Mem_OK:
 
         int     $0x10
 
-        cmpw    $0x04F,%ax
+        cmpw    $0x004F,%ax
 
         jz      Label_Get_Mem_OK.KO
 
@@ -401,6 +401,32 @@ Label_Get_Mem_OK.KO:
         popw    %ax
         movw    $GetSVGAVBEInfoOKMessage, %bp
         int     $0x10
+
+
+#=======        Get SVGA Mode Info
+
+        movw    $0x1301,%ax
+        movw    $0x000F,%bx
+        movw    $0x0C00,%dx              #row 12
+        movw    $24,%cx
+        pushw   %ax
+        movw    %ds,%ax
+        movw    %ax,%es
+        popw    %ax
+        movw    $StartGetSVGAModeInfoMessage, %bp
+        int     $0x10
+
+
+        movw    $0x0000,%ax
+        movw    %ax,%es
+        movw    $0x800e,%si
+
+        movl    %es:(%si),%esi
+        movl    $0x8200,%edi
+
+Label_SVGA_Mode_Info_Get: 
+
+        movw    es:esi,%cx
 
 ######
 #=======        tmp IDT
