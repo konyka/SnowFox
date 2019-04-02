@@ -578,6 +578,14 @@ GO_TO_TMP_Protect:
         movl    $0x90000,%eax
         movl    %eax, $cr3
 
+#=======        enable long-mode
+
+        movl    $0xC0000080,%ecx                #IA32_EFER
+        rdmsr
+
+        btsl    $8,%eax
+        wrmsr
+
 ######
 #=======        tmp IDT
 
