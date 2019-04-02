@@ -534,6 +534,26 @@ GO_TO_TMP_Protect:
 
         jz      no_support
 
+
+#=======        init temporary page table 0x90000
+
+        movl    $0x91007,0x90000
+        movl    $0x91007,0x90800
+
+        movl    $0x92007,0x91000
+
+        movl    $0x000083,0x92000
+
+        movl    $0x200083,0x92008
+
+        movl    $0x400083,0x92010
+
+        movl    $0x600083,0x92018
+
+        movl    $0x800083,0x92020
+
+        movl    $0xa00083,0x92028
+
 ######
 #=======        tmp IDT
 
