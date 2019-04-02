@@ -291,7 +291,6 @@ Label_File_Loaded:
         movb    $'G', %al
         movw     %ax,%gs:(((80 * 0 + 39) * 2))
 
-<<<<<<< HEAD
 KillMotor: 
 
         pushw   %dx
@@ -299,7 +298,6 @@ KillMotor:
         movb    $0,%al
         outb    %al,%dx
         popw    %dx
-=======
 #=======        get memory address size type
 
         movw    $0x1301,%ax
@@ -741,7 +739,6 @@ Label_DispAL.2:
 
         ret
 
->>>>>>> dev
 
 ######
 #=======        tmp IDT
