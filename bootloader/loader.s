@@ -334,7 +334,8 @@ Label_Get_Mem_Fail:
         popw    %ax
         movw    $GetMemStructErrMessage, %bp
         int     $0x10
-        jmp     $
+Label_Current_Line337:
+        jmp     Label_Current_Line337
 
 Label_Get_Mem_OK: 
 
@@ -347,6 +348,58 @@ Label_Get_Mem_OK:
         movw    %ax,%es
         popw    %ax
         movw    $GetMemStructOKMessage, %bp
+        int     $0x10
+
+#=======        get SVGA information
+
+        movw    $0x1301,%ax
+        movw    $0x00F,%bx
+        movw    $0x800,%dx              #row 8
+        movw    $23,%cx
+        pushw   %ax
+        movw    %ds,%ax
+        movw    %ax,%es
+        popw    %ax
+        movw    $StartGetSVGAVBEInfoMessage, %bp
+        int     $0x10
+
+        movw    $0x00,%ax
+        movw    %ax,%es
+        movw    $0x8000,%di
+        movw    $0x4F00,%ax
+
+        int     $0x10
+
+        cmpw    $0x04F,%ax
+
+        jz      Label_Get_Mem_OK.KO
+
+#=======        Fail
+
+        movw    $0x1301,%ax
+        movw    $0x008C,%bx
+        movw    $0x0900,%dx              #row 9
+        movw    $23,%cx
+        pushw   %ax
+        movw    %ds,%ax
+        movw    %ax,%es
+        popw    %ax
+        movw    $GetSVGAVBEInfoErrMessage, %bp
+        int     $0x10
+
+        jmp     $
+
+Label_Get_Mem_OK.KO: 
+
+        movw    $0x1301,%ax
+        movw    $0x000F,%bx
+        movw    $0x0A00,%dx              #row 10
+        movw    $29,%cx
+        pushw   %ax
+        movw    %ds,%ax
+        movw    %ax,%es
+        popw    %ax
+        movw    $GetSVGAVBEInfoOKMessage, %bp
         int     $0x10
 
 ######
