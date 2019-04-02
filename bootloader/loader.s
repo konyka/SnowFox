@@ -618,6 +618,37 @@ support_long_mode_done:
 no_support: 
         jmp     no_support
 
+#=======        read one sector from floppy
+
+#.section .s16lib
+#.code16
+
+Func_ReadOneSector: 
+
+        pushw   %bp
+        movw    %sp,%bp
+        subl    $2,%esp
+        movb     %cl, -2(%bp)
+        pushw   %bx
+        movb    BPB_SecPerTrk,%bl
+        divb    %bl
+        incl    $0xa
+        movb    %ah,%cl
+        movb    %al,%dh
+        shrb    %al
+        movb    %al,%ch
+        andb    $1,%dh
+        popw    %bx
+        movb    BS_DrvNum,%dl
+Label_Go_On_Reading: 
+        movb    $2,%ah
+        movb    -2(%bp),%al
+        int     $0x13
+        jc      Label_Go_On_Reading
+        addl    $2,%esp
+        popw    %bp
+        ret
+
 ######
 #=======        tmp IDT
 
