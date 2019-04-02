@@ -499,6 +499,41 @@ Label_SVGA_Mode_Info_Finish:
         cmpw    $0x04F,%ax
         jnz     Label_SET_SVGA_Mode_VESA_VBE_FAIL
 
+
+#=======        init IDT GDT goto protect mode 
+
+        cli                     #======close interrupt
+
+
+        lgdtl    GdtPtr
+
+#       lidtl    IDT_POINTER
+
+        movl    $cr0, %eax
+        orl     $1,%eax
+        movl    %eax, $cr0
+
+        jmpl    SelectorCode32,GO_TO_TMP_Protect
+
+#.section .s32
+#.code32
+
+GO_TO_TMP_Protect: 
+
+#=======        go to tmp long mode
+
+        movw    $0x10,%ax
+        movw    %ax,%ds
+        movw    %ax,%es
+        movw    %ax,%fs
+        movw    %ax,%ss
+        movl    $0x7E00,%esp
+
+        call    support_long_mode
+        testl   %eax,%eax
+
+        jz      no_support
+
 ######
 #=======        tmp IDT
 
