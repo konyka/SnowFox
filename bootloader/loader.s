@@ -586,6 +586,15 @@ GO_TO_TMP_Protect:
         btsl    $8,%eax
         wrmsr
 
+#=======        open PE and paging
+
+        movl    $cr0, %eax
+        btsl    $0,%eax
+        btsl    $31,%eax
+        movl    %eax, $cr0
+
+        jmp     $SelectorCode64,OffsetOfKernelFile
+
 ######
 #=======        tmp IDT
 
