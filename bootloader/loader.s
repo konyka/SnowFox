@@ -567,6 +567,12 @@ GO_TO_TMP_Protect:
 
         movl    $0x7E00,%esp
 
+#=======        open PAE
+
+        movl    $cr4, %eax
+        btsl    $5,%eax
+        movl    %eax, $cr4
+
 ######
 #=======        tmp IDT
 
