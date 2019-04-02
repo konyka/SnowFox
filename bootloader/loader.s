@@ -765,29 +765,29 @@ DisplayPosition:
 StartLoaderMessage:
         .ascii      "Start Loader......"
 NoLoaderMessage:
-        .byte       "ERROR:No KERNEL Found"
+        .ascii       "ERROR:No KERNEL Found"
 KernelFileName:
-        .byte      "KERNEL  BIN"
+        .ascii      "KERNEL  BIN"
 StartGetMemStructMessage:
-        .byte      "Start Get Memory Struct."
+        .ascii      "Start Get Memory Struct."
 GetMemStructErrMessage:
-        .byte      "Get Memory Struct ERROR"
+        .ascii      "Get Memory Struct ERROR"
 GetMemStructOKMessage:
-        .byte      "Get Memory Struct SUCCESSFUL!"
+        .ascii      "Get Memory Struct SUCCESSFUL!"
 
 StartGetSVGAVBEInfoMessage:
-        .byte      "Start Get SVGA VBE Info"
+        .ascii      "Start Get SVGA VBE Info"
 GetSVGAVBEInfoErrMessage:
-        .byte      "Get SVGA VBE Info ERROR"
+        .ascii      "Get SVGA VBE Info ERROR"
 GetSVGAVBEInfoOKMessage:
-        .byte      "Get SVGA VBE Info SUCCESSFUL!"
+        .ascii      "Get SVGA VBE Info SUCCESSFUL!"
 
 StartGetSVGAModeInfoMessage:
-        .byte      "Start Get SVGA Mode Info"
+        .ascii      "Start Get SVGA Mode Info"
 GetSVGAModeInfoErrMessage:
-        .byte      "Get SVGA Mode Info ERROR"
+        .ascii      "Get SVGA Mode Info ERROR"
 GetSVGAModeInfoOKMessage:
-        .byte      "Get SVGA Mode Info SUCCESSFUL!"
+        .ascii      "Get SVGA Mode Info SUCCESSFUL!"
 
 
 
