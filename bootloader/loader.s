@@ -649,6 +649,90 @@ Label_Go_On_Reading:
         popw    %bp
         ret
 
+#=======        get FAT Entry
+
+Func_GetFATEntry: 
+
+        pushw   %es
+        pushw   %bx
+        pushw   %ax
+        movw    $00,%ax
+        movw    %ax,%es
+        popw    %ax
+        movb    $0,Odd
+        movw    $3,%bx
+        mulw    %bx
+        movw    $2,%bx
+        divw    %bx
+        cmpw    $0,%dx
+        jz      Label_Even
+        movb    $1,Odd
+
+Label_Even: 
+
+        xorw    %dx,%dx
+        movw    BPB_BytesPerSec,%bx
+        divw    %bx
+        pushw   %dx
+        movw    $0x8000,%bx
+        addw    $SectorNumOfFAT1Start, %ax
+        movb    $2,%cl
+        call    Func_ReadOneSector
+
+        popw    %dx
+        addw    %dx,%bx
+        movw    es:bx,%ax
+        cmpb    $1,Odd
+        jnz     Label_Even_2
+        shrw    $4,%ax
+
+Label_Even_2: 
+        andw    $0xFFF,%ax
+        popw    %bx
+        popw    %es
+        ret
+
+#=======        display num in al
+
+Label_DispAL: 
+
+        pushl   %ecx
+        pushl   %edx
+        pushl   %edi
+
+        movl    DisplayPosition,%edi
+        movb    $0xF,%ah
+        movb    %al,%dl
+        shrb    $4,%al
+        movl    $2,%ecx
+Label_DispAL.begin: 
+
+        andb    $0xF,%al
+        cmpb    $9,%al
+        ja      Label_DispAL.1
+        addb    $'0', %al
+        jmp     Label_DispAL.2
+Label_DispAL.1: 
+
+        subb    $0xA,%al
+        addb    $'A', %al
+Label_DispAL.2: 
+
+        movw    %ax,gs:edi
+        addl    $2,%edi
+
+        movb    %dl,%al
+        loop    Label_DispAL.begin
+
+        movl    %edi,DisplayPosition
+
+        popl    %edi
+        popl    %edx
+        popl    %ecx
+
+        ret
+
+
 ######
 #=======        tmp IDT
 
