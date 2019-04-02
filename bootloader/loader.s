@@ -291,6 +291,64 @@ Label_File_Loaded:
         movb    $'G', %al
         movw     %ax,%gs:(((80 * 0 + 39) * 2))
 
+#=======        get memory address size type
+
+        movw    $0x1301,%ax
+        movw    $0x000F,%bx
+        movw    $0x0400,%dx              #row 4
+        movw    $24,%cx
+        pushw   %ax
+        movw    %ds,%ax
+        movw    %ax,%es
+        popw    %ax
+        movw    $StartGetMemStructMessage, %bp
+        int     $0x10
+
+        movl    $0,%ebx
+        movw    $0x00,%ax
+        movw    %ax,%es
+        movw    $MemoryStructBufferAddr, %di
+
+Label_Get_Mem_Struct: 
+
+        movl    $0x0E820,%eax
+        movl    $20,%ecx
+        movl    $0x534D4150,%edx
+        int     $0x15
+        jc      Label_Get_Mem_Fail
+        addw    $20,%di
+
+        cmpl    $0,%ebx
+        jne     Label_Get_Mem_Struct
+        jmp     Label_Get_Mem_OK
+
+Label_Get_Mem_Fail: 
+
+        movw    $0x1301,%ax
+        movw    $0x08C,%bx
+        movw    $0x500,%dx              #row 5
+        movw    $23,%cx
+        pushw   %ax
+        movw    %ds,%ax
+        movw    %ax,%es
+        popw    %ax
+        movw    $GetMemStructErrMessage, %bp
+        int     $0x10
+        jmp     $
+
+Label_Get_Mem_OK: 
+
+        movw    $0x1301,%ax
+        movw    $0x000F,%bx
+        movw    $0x0600,%dx              #row 6
+        movw    $29,%cx
+        pushw   %ax
+        movw    %ds,%ax
+        movw    %ax,%es
+        popw    %ax
+        movw    $GetMemStructOKMessage, %bp
+        int     $0x10
+
 ######
 #=======        tmp IDT
 
